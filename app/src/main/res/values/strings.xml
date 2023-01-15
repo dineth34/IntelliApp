@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Smart Navigator</string>
+    <string name="select_a_map_to_start">SELECT A MAP TO START</string>
+    <string name="email">Email</string>
+</resources>

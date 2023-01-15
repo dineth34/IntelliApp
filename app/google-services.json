@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "983152577945",
+    "project_id": "intelliapp-f21bd",
+    "storage_bucket": "intelliapp-f21bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983152577945:android:3a36813df7f446de2ad708",
+        "android_client_info": {
+          "package_name": "com.example.intelliapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983152577945-0o0uiov083smka2kn9nrnvnqc3i9gkug.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfdyPVdDRJ0IvTA7wSaFRFT6D7rw-FQoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983152577945-0o0uiov083smka2kn9nrnvnqc3i9gkug.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
