@@ -34,7 +34,7 @@ public class WelcomePage extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.viewMaps:
-                Intent intent1=new Intent(this, MapList.class);
+                Intent intent1=new Intent(this, QRPage.class);
                 intent1.putExtra("username",getIntent().getExtras().get("username").toString());
                 intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

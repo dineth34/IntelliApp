@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.intelliapp.DashBoard.QRPage;
 import com.example.intelliapp.login.Login;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button1:
-                Intent intent1=new Intent(this, Login.class);
+                Intent intent1=new Intent(this, QRPage.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent1);

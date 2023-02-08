@@ -1,45 +1,44 @@
 package com.example.intelliapp.DashBoard;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.intelliapp.R;
-import com.example.intelliapp.login.Login;
 
 import java.util.ArrayList;
 
 
-public class MapList extends AppCompatActivity {
-    private ListView lvItem;
-    private ArrayList<String> itemArray;
-    private ArrayAdapter<String> itemAdapter;
-    int selected=0;
+public class QRPage extends AppCompatActivity {
 
-    ArrayList allLists;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.map_list_layout);
+        setContentView(R.layout.qr_page_layout);
         setUpView();
     }
 
+
     private void setUpView() {
-        lvItem = (ListView)this.findViewById(R.id.listView_open);
-        allLists = new ArrayList<>();
-        itemArray = new ArrayList<String>();
-        itemArray.clear();
-
-        itemArray.add("Sumanadasa Building 2nd Floor");
-        itemArray.add("Goda Canteen");
-        itemArray.add("L Canteen");
-        itemArray.add("Library Ground Floor");
-
-        itemAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,itemArray);
-        lvItem.setAdapter(itemAdapter);
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int screenWidth = displayMetrics.widthPixels;
+//        int screenHeight = displayMetrics.heightPixels;
+//        Toast.makeText(getApplicationContext(),String.valueOf(screenHeight) + " " + String.valueOf(screenWidth),Toast.LENGTH_SHORT).show();
+//
+//        ImageView s = (ImageView) findViewById(R.id.curr_position);
+//        s.setX(screenWidth/2);
+//        s.setY(screenHeight/2);
 
     }
 
