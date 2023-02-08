@@ -15,7 +15,7 @@
         <activity android:name=".login.Login"/>
         <activity android:name=".signup.SignUp"/>
         <activity android:name=".DashBoard.WelcomePage"/>
-        <activity android:name=".DashBoard.MapList"/>
+        <activity android:name=".DashBoard.QRPage"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
