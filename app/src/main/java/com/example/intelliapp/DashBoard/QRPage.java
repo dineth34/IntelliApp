@@ -1,5 +1,7 @@
 package com.example.intelliapp.DashBoard;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -18,14 +20,20 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.intelliapp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,8 +45,11 @@ public class QRPage extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    private DocumentSnapshot document;
 
+    private String[] list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +113,29 @@ public class QRPage extends AppCompatActivity {
                     // Do something with the detected barcodes
                     if (barcodes.size() >= 1){
                         barcodeValue = barcodes.valueAt(0).displayValue;
+                        list = barcodeValue.split("_");
+                    }
+
+
+                    if (list[0].equals("intelliapp") && list[1] != null){
+                        DocumentReference docRef = db.collection("entries").document(list[1]);
+                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    document = task.getResult();
+                                    if (document.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                    }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
+                                }
+                            }
+                        });
+                    } else if (list[0] != "intelliapp" ) {
+//                        Toast.makeText(getApplicationContext(),"Try Again",Toast.LENGTH_SHORT).show();
                     }
 
 //                    // If a barcode is detected, finish the activity
@@ -109,9 +143,11 @@ public class QRPage extends AppCompatActivity {
 //                        Log.e("QR Value", "SCANNED VALUE: " + barcodeValue);
 //                        finish();
 //                    }
-                    if (barcodes.size() != 0) {
+                    if (barcodes.size() != 0 && document.exists()) {
                         Intent intent1=new Intent(getBaseContext(), MapScreen.class);
                         intent1.putExtra("barcode", barcodeValue);
+                        intent1.putExtra("ratioX", document.get("ratioX").toString());
+                        intent1.putExtra("ratioY", document.get("ratioY").toString());
                         setResult(RESULT_OK, intent1);
                         startActivity(intent1);
                         overridePendingTransition(0,0);
