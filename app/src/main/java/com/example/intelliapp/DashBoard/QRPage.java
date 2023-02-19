@@ -3,22 +3,13 @@ package com.example.intelliapp.DashBoard;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +27,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class QRPage extends AppCompatActivity {
@@ -47,7 +37,9 @@ public class QRPage extends AppCompatActivity {
     private CameraSource cameraSource;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private DocumentSnapshot document;
+    private DocumentSnapshot entryDoc;
+
+    private DocumentSnapshot mapDoc;
 
     private String[] list;
 
@@ -118,14 +110,31 @@ public class QRPage extends AppCompatActivity {
 
 
                     if (list[0].equals("intelliapp") && list[1] != null){
-                        DocumentReference docRef = db.collection("entries").document(list[1]);
-                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        DocumentReference entryDocRef = db.collection("entries").document(list[1]);
+                        entryDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
-                                    document = task.getResult();
-                                    if (document.exists()) {
-                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                    entryDoc = task.getResult();
+                                    if (entryDoc.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + entryDoc.getData());
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                    }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
+                                }
+                            }
+                        });
+
+                        DocumentReference mapDocRef = db.collection("maps").document(entryDoc.get("mapID").toString());
+                        mapDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    mapDoc = task.getResult();
+                                    if (entryDoc.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + mapDoc.getData());
                                     } else {
                                         Log.d(TAG, "No such document");
                                     }
@@ -143,11 +152,12 @@ public class QRPage extends AppCompatActivity {
 //                        Log.e("QR Value", "SCANNED VALUE: " + barcodeValue);
 //                        finish();
 //                    }
-                    if (barcodes.size() != 0 && document.exists()) {
+                    if (barcodes.size() != 0 && entryDoc.exists() && mapDoc.exists()) {
                         Intent intent1=new Intent(getBaseContext(), MapScreen.class);
                         intent1.putExtra("barcode", barcodeValue);
-                        intent1.putExtra("ratioX", document.get("ratioX").toString());
-                        intent1.putExtra("ratioY", document.get("ratioY").toString());
+                        intent1.putExtra("ratioX", entryDoc.get("ratioX").toString());
+                        intent1.putExtra("ratioY", entryDoc.get("ratioY").toString());
+                        intent1.putExtra("backgroundUrl", mapDoc.get("url").toString());
                         setResult(RESULT_OK, intent1);
                         startActivity(intent1);
                         overridePendingTransition(0,0);

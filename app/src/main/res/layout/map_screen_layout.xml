@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/map2" />
+             />
 
         <ImageView
             android:id="@+id/curr_position"

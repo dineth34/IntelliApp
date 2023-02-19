@@ -1,5 +1,7 @@
 package com.example.intelliapp.DashBoard;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -8,12 +10,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.intelliapp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 public class MapScreen extends AppCompatActivity {
     private TextView scanned_text;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +38,19 @@ public class MapScreen extends AppCompatActivity {
     private void setUpView() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenWidth = displayMetrics.widthPixels;
-        int screenHeight = displayMetrics.heightPixels;
+//        int screenWidth = displayMetrics.widthPixels;
+//        int screenHeight = displayMetrics.heightPixels;
 //        Toast.makeText(getApplicationContext(),String.valueOf(screenHeight) + " " + String.valueOf(screenWidth),Toast.LENGTH_SHORT).show();
 
         ImageView curr_position = (ImageView) findViewById(R.id.curr_position);
+
         final ImageView background = findViewById(R.id.background);
+
+        if (getIntent().getExtras().get("backgroundUrl") != null){
+            String downloadUrl = getIntent().getExtras().get("backgroundUrl").toString();
+            Picasso.with(this).load(downloadUrl).into(background);
+        }
+
         ViewTreeObserver vto = background.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
