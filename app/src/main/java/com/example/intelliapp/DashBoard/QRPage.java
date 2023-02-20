@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.intelliapp.DashBoard.IMU.MapScreen;
 import com.example.intelliapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -154,10 +155,10 @@ public class QRPage extends AppCompatActivity {
 //                    }
                     if (barcodes.size() != 0 && entryDoc.exists() && mapDoc.exists()) {
                         Intent intent1=new Intent(getBaseContext(), MapScreen.class);
-                        intent1.putExtra("barcode", barcodeValue);
                         intent1.putExtra("ratioX", entryDoc.get("ratioX").toString());
                         intent1.putExtra("ratioY", entryDoc.get("ratioY").toString());
                         intent1.putExtra("backgroundUrl", mapDoc.get("url").toString());
+                        intent1.putExtra("mapName", mapDoc.get("mapName").toString());
                         setResult(RESULT_OK, intent1);
                         startActivity(intent1);
                         overridePendingTransition(0,0);

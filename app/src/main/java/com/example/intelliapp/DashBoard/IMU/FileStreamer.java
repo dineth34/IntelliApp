@@ -1,4 +1,4 @@
-package com.example.intelliapp.DashBoard;
+package com.example.intelliapp.DashBoard.IMU;
 
 import android.content.Context;
 import android.content.Intent;

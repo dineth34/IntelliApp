@@ -1,4 +1,4 @@
-package com.example.intelliapp.DashBoard;
+package com.example.intelliapp.DashBoard.IMU;
 
 public class IMUConfig implements java.io.Serializable {
 

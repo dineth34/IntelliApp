@@ -25,8 +25,7 @@
         <activity android:name=".signup.SignUp"/>
         <activity android:name=".DashBoard.WelcomePage"/>
         <activity android:name=".DashBoard.QRPage"/>
-        <activity android:name=".DashBoard.MapScreen"/>
-        <activity android:name=".DashBoard.Sensor"/>
+        <activity android:name=".DashBoard.IMU.MapScreen"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

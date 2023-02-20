@@ -5,26 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E5E5E5"
-    tools:context=".DashBoard.MapScreen">
+    tools:context=".DashBoard.IMU.MapScreen">
 
-        <ImageView
-            android:id="@+id/background"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-             />
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        />
 
-        <ImageView
-            android:id="@+id/curr_position"
-            android:layout_width="20px"
-            android:layout_height="20px"
-            app:srcCompat="@drawable/curr_position" />
+    <ImageView
+        android:id="@+id/curr_position"
+        android:layout_width="20px"
+        android:layout_height="20px"
+        app:srcCompat="@drawable/curr_position" />
     <TextView
-        android:id="@+id/scanned_text"
+        android:id="@+id/mapName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:flow_horizontalAlign="center"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom|center"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingBottom="16dp"/>
 
 </FrameLayout>

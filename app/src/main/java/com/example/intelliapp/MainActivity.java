@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.intelliapp.DashBoard.QRPage;
-import com.example.intelliapp.DashBoard.Sensor;
-import com.example.intelliapp.login.Login;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -26,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.e("QR Code Scanner", "MAIN ACTIVITY ");
         switch (view.getId()) {
             case R.id.button1:
-                Intent intent1=new Intent(this, Sensor.class);
+                Intent intent1=new Intent(this, QRPage.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent1);

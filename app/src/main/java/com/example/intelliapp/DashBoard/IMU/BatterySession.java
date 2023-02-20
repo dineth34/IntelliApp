@@ -1,9 +1,6 @@
-package com.example.intelliapp.DashBoard;
+package com.example.intelliapp.DashBoard.IMU;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.util.Log;
@@ -23,7 +20,7 @@ public class BatterySession implements Runnable {
     private final static int DEFAULT_INTERVAL = 1000;
     private int mBatteryInterval = DEFAULT_INTERVAL;
 
-    private Sensor mContext;
+    private MapScreen mContext;
     private Handler mHandler = new Handler();
 
     private AtomicBoolean mIsRunning = new AtomicBoolean(false);
@@ -35,13 +32,13 @@ public class BatterySession implements Runnable {
 
 
     // constructor
-    public BatterySession(@NonNull Sensor context, int interval) {
+    public BatterySession(@NonNull MapScreen context, int interval) {
         this.mContext = context;
         this.mBatteryInterval = interval;
         mBatteryManager = (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
     }
 
-    BatterySession(@NonNull Sensor context) {
+    BatterySession(@NonNull MapScreen context) {
         this(context, DEFAULT_INTERVAL);
     }
 

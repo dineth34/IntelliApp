@@ -1,4 +1,4 @@
-package com.example.intelliapp.DashBoard;
+package com.example.intelliapp.DashBoard.IMU;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,7 +28,7 @@ public class WifiSession implements Runnable {
     private final static int DEFAULT_INTERVAL = 1000;
     private int mScanInterval = DEFAULT_INTERVAL;
 
-    private Sensor mContext;
+    private MapScreen mContext;
     private Handler mHandler = new Handler();
 
     private AtomicBoolean mIsRunning = new AtomicBoolean(false);
@@ -66,13 +66,13 @@ public class WifiSession implements Runnable {
 
 
     // constructor
-    public WifiSession(@NonNull Sensor context, int interval) {
+    public WifiSession(@NonNull MapScreen context, int interval) {
         this.mContext = context;
         this.mScanInterval = interval;
         mWifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
-    WifiSession(@NonNull Sensor context) {
+    WifiSession(@NonNull MapScreen context) {
         this(context, DEFAULT_INTERVAL);
     }
 
