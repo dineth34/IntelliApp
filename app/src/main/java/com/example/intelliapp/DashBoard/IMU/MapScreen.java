@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -58,12 +59,35 @@ public class MapScreen extends AppCompatActivity implements WifiSession.WifiScan
 
     private TextView mapName;
 
+    private TextView X;
+
+    private TextView Y;
+
+    private TextView Z;
+
+    long lastTimestamp = System.nanoTime();
+
+    float[] displacement = new float[3];
+
+    ImageView curr_position;
+
+    ImageView background;
+
+    Float pixelToUnitRatio;
+
+    int screenWidth;
+
+    int screenHeight;
     // Android activity lifecycle states
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_screen_layout);
         mapName = (TextView) this.findViewById(R.id.mapName);
+        X = (TextView) this.findViewById(R.id.X);
+        Y = (TextView) this.findViewById(R.id.Y);
+        Z = (TextView) this.findViewById(R.id.Z);
+
         mapName.setText(getIntent().getExtras().get("mapName").toString());
         Log.e("QR Value", "SCANNED VALUE : Map Page " + getIntent().getExtras().get("mapName").toString());
         setUpView();
@@ -87,13 +111,14 @@ public class MapScreen extends AppCompatActivity implements WifiSession.WifiScan
     private void setUpView() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        int screenWidth = displayMetrics.widthPixels;
-//        int screenHeight = displayMetrics.heightPixels;
+        screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
+        pixelToUnitRatio = screenWidth/Float.parseFloat(getIntent().getExtras().get("width").toString());
 //        Toast.makeText(getApplicationContext(),String.valueOf(screenHeight) + " " + String.valueOf(screenWidth),Toast.LENGTH_SHORT).show();
 
-        ImageView curr_position = (ImageView) findViewById(R.id.curr_position);
+        curr_position = (ImageView) findViewById(R.id.curr_position);
 
-        final ImageView background = findViewById(R.id.background);
+        background = findViewById(R.id.background);
 
         if (getIntent().getExtras().get("backgroundUrl") != null){
             String downloadUrl = getIntent().getExtras().get("backgroundUrl").toString();
@@ -312,6 +337,129 @@ public class MapScreen extends AppCompatActivity implements WifiSession.WifiScan
 
         final float[] magnet_data = mIMUSession.getMagnetMeasure();
         final float[] magnet_bias = mIMUSession.getMagnetBias();
+
+        // Initialize variables
+        float[] gravity = new float[3];
+        float[] geomagnetic = new float[3];
+        float[] rotationMatrix = new float[9];
+        float[] inclinationMatrix = new float[9];
+        float[] orientationMatrix = new float[9];
+
+// Get the rotation matrix and inclination matrix
+        SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, gravity, geomagnetic);
+
+// Apply the gyroscope data to the rotation matrix
+        float timeDelta = 0.01f; // Time delta between sensor readings in seconds
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, gyro_data);
+        SensorManager.getOrientation(rotationMatrix, orientationMatrix);
+
+// Apply the accelerometer and magnetometer biases to the rotation matrix
+        for (int i = 0; i < 3; i++) {
+            gravity[i] = acce_data[i] - acce_bias[i];
+            geomagnetic[i] = magnet_data[i] - magnet_bias[i];
+        }
+        SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic);
+
+// Apply the complementary filter
+        float alpha = 0.8f; // Complementary filter coefficient
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, gyro_data);
+        SensorManager.getOrientation(rotationMatrix, orientationMatrix);
+        for (int i = 0; i < 9; i++) {
+            orientationMatrix[i] = alpha * orientationMatrix[i] + (1 - alpha) * rotationMatrix[i];
+        }
+
+        // Initialize variables
+        float[] velocity = new float[3];
+
+        float[] lastVelocity = new float[3];
+        float[] lastOrientation = new float[]{1, 0, 0, 0}; // The identity quaternion
+
+
+// Update velocity and displacement
+        long currentTimestamp = System.nanoTime();
+        float timeDeltaFinal = (currentTimestamp - lastTimestamp) / 1e9f; // Time delta in seconds
+        lastTimestamp = currentTimestamp;
+
+// Get angular velocity in the world coordinate system
+        float[] angularVelocity = new float[3];
+        angularVelocity[0] = gyro_data[0] - gyro_bias[0];
+        angularVelocity[1] = gyro_data[1] - gyro_bias[1];
+        angularVelocity[2] = gyro_data[2] - gyro_bias[2];
+        float[] orientation = new float[4];
+        SensorManager.getQuaternionFromVector(orientation, angularVelocity);
+
+// Integrate angular velocity to obtain orientation
+        for (int i = 0; i < 4; i++) {
+            orientation[i] = lastOrientation[i] + orientation[i] * timeDeltaFinal / 2;
+        }
+        lastOrientation = orientation;
+
+// Convert the orientation quaternion to a rotation matrix
+        float[] R = new float[9];
+        SensorManager.getRotationMatrixFromVector(R, orientation);
+
+// Update velocity and displacement using the rotation matrix
+        float[] deltaDisplacement = new float[3];
+        for (int i = 0; i < 3; i++) {
+            deltaDisplacement[i] = velocity[i] * timeDeltaFinal + 0.5f * (orientationMatrix[i] + orientationMatrix[3+i] + orientationMatrix[6+i]) * timeDeltaFinal * timeDelta;
+            velocity[i] += (lastVelocity[i] + (orientationMatrix[i] + orientationMatrix[3+i] + orientationMatrix[6+i]) / 2 * timeDeltaFinal);
+        }
+        lastVelocity = velocity;
+
+// Integrate velocity to obtain displacement
+        for (int i = 0; i < 3; i++) {
+            if (!Float.isNaN(deltaDisplacement[i])){
+                displacement[i] += deltaDisplacement[i];
+            }
+        }
+
+        ViewTreeObserver vto = background.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Get the dimensions of the ImageView here
+//                curr_position.setX(background.getWidth()/2);
+//                curr_position.setY(background.getHeight()/2);
+                //pixelToUnitRatio = how many pixels are used to represent a lucid unit pixel/unit
+                //scale = how many units are used to represent a meter unit/meter
+                if (curr_position.getX() + displacement[0]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio < 0){
+                    curr_position.setX(0-10);
+                }else if (curr_position.getX() + displacement[0]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio > screenWidth){
+                    curr_position.setX(screenWidth-10);
+                }else {
+                    curr_position.setX(curr_position.getX() + displacement[0]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio);
+                }
+
+                if(curr_position.getY() + displacement[1]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio < 0){
+                    curr_position.setY(0-10);
+                }else if (curr_position.getY() + displacement[1]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio > Float.parseFloat(getIntent().getExtras().get("height").toString())*pixelToUnitRatio){
+                    curr_position.setY(Float.parseFloat(getIntent().getExtras().get("height").toString())*pixelToUnitRatio-10);
+                }else{
+                    curr_position.setY(curr_position.getY() + displacement[1]*Float.parseFloat(getIntent().getExtras().get("scale").toString())*pixelToUnitRatio);
+                }
+                // Remove the listener to avoid redundant callbacks
+                background.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+        X.setText(String.format(Locale.US, "%.3f", displacement[0]));
+        Y.setText(String.format(Locale.US, "%.3f", displacement[1]));
+        Z.setText(String.format(Locale.US, "%.3f", displacement[2]));
+
+//        Toast.makeText(getApplicationContext(), String.format(Locale.US, "%.3f", displacement[0]) +" " +
+//                        String.format(Locale.US, "%.3f", displacement[1]) +" " +
+//                        String.format(Locale.US, "%.3f", displacement[2])
+//                ,Toast.LENGTH_SHORT).show();
+
+//        Toast.makeText(getApplicationContext(),String.format(Locale.US, "%.3f", orientationMatrix[0]) +" " +
+//                String.format(Locale.US, "%.3f", orientationMatrix[1]) +" " +
+//                String.format(Locale.US, "%.3f", orientationMatrix[2]) +"\n" +
+//                String.format(Locale.US, "%.3f", orientationMatrix[3]) +" " +
+//                String.format(Locale.US, "%.3f", orientationMatrix[4]) +" " +
+//                String.format(Locale.US, "%.3f", orientationMatrix[5]) +"\n" +
+//                String.format(Locale.US, "%.3f", orientationMatrix[6]) +" " +
+//                        String.format(Locale.US, "%.3f", orientationMatrix[7]) +" " +
+//                        String.format(Locale.US, "%.3f", orientationMatrix[8]),Toast.LENGTH_SHORT).show();
+
 
         // update current screen (activity)
         runOnUiThread(new Runnable() {

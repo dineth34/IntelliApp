@@ -21,6 +21,27 @@
         android:layout_height="20px"
         app:srcCompat="@drawable/curr_position" />
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:layout_gravity="bottom|left"
+        android:paddingBottom="40dp"
+        android:id="@+id/X"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:layout_gravity="bottom|center"
+        android:paddingBottom="40dp"
+        android:id="@+id/Y"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:layout_gravity="bottom|right"
+        android:paddingBottom="40dp"
+        android:id="@+id/Z"/>
+    <TextView
         android:id="@+id/mapName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

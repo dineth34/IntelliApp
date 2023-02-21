@@ -159,6 +159,9 @@ public class QRPage extends AppCompatActivity {
                         intent1.putExtra("ratioY", entryDoc.get("ratioY").toString());
                         intent1.putExtra("backgroundUrl", mapDoc.get("url").toString());
                         intent1.putExtra("mapName", mapDoc.get("mapName").toString());
+                        intent1.putExtra("scale", mapDoc.get("scale").toString());
+                        intent1.putExtra("width", mapDoc.get("width").toString());
+                        intent1.putExtra("height", mapDoc.get("height").toString());
                         setResult(RESULT_OK, intent1);
                         startActivity(intent1);
                         overridePendingTransition(0,0);
